@@ -4,8 +4,8 @@
   "description": "El mejor juego de beber para tus fiestas.",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#080c14",
-  "theme_color": "#ff007f",
+  "background_color": "#000000",
+  "theme_color": "#000000",
   "orientation": "portrait",
   "icons": [
     {
