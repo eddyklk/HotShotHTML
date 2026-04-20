@@ -222,7 +222,7 @@
                 if (!response.ok) throw new Error("Network error");
                 const data = await response.json();
                 chillCards = data.chill; partyCards = data.party; extremeCards = data.extreme; hotCards = data.hot;
-                statusLabel.innerText = "SINCRO EN LA NUBE COMPLETADA ✨";
+                statusLabel.innerText = "✨";
                 statusLabel.classList.replace('text-slate-400', 'text-green-400');
             } catch (error) {
                 chillCards = backupCards.chill; partyCards = backupCards.party; extremeCards = backupCards.extreme; hotCards = backupCards.hot;
