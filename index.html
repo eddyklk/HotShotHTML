@@ -9,6 +9,8 @@
     <meta name="theme-color" content="#000000">
     <link rel="apple-touch-icon" href="./icon-192.png">
     
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4859809577184969" crossorigin="anonymous"></script>
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
     <style>
@@ -22,7 +24,6 @@
             --neon-gold: #ffd700;
         }
 
-        /* FONDO DEL JUEGO: Negro Puro */
         body {
             font-family: 'Poppins', sans-serif;
             background-color: #000000;
@@ -56,7 +57,7 @@
         }
     </style>
 </head>
-<body class="min-h-screen flex flex-col items-center justify-center p-3 sm:p-4">
+<body class="min-h-screen flex flex-col items-center justify-center p-3 sm:p-4 pb-20">
 
     <div id="splash-screen" class="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-[#000000] transition-opacity duration-500">
         <div class="animate__animated animate__pulse animate__infinite flex flex-col items-center">
@@ -139,27 +140,57 @@
         </div>
     </div>
 
-    <div id="impostor-screen" class="hidden w-full max-w-md animate__animated animate__fadeIn relative z-10 text-center flex flex-col justify-center min-h-[80vh]">
+    <div id="impostor-screen" class="hidden w-full max-w-md animate__animated animate__fadeIn relative z-10 text-center flex flex-col justify-center min-h-[70vh]">
         <div class="flex justify-between items-center absolute top-2 left-0 right-0 w-full">
             <button onclick="requestExit()" class="text-slate-500 hover:text-white transition-colors font-bold text-[10px] tracking-widest">✕ SALIR</button>
             <div class="bg-cyan-500/10 px-3 py-1.5 rounded-full border border-cyan-500/50 text-cyan-400 text-[10px] font-black uppercase tracking-widest">
                 MODO IMPOSTOR 🕵️
             </div>
         </div>
-
         <div id="impostor-content" class="mt-12 w-full"></div>
     </div>
 
-    <div id="exit-modal" class="fixed inset-0 modal-overlay z-50 hidden flex items-center justify-center p-4">
+    <div id="exit-modal" class="fixed inset-0 modal-overlay z-[90] hidden flex items-center justify-center p-4">
         <div class="glass p-6 rounded-[25px] max-w-sm w-full text-center border-t-8 border-pink-500 animate__animated animate__bounceIn">
             <div class="text-5xl mb-3">⚠️</div>
             <h2 class="text-xl font-black mb-3 text-white uppercase tracking-tight">¿TERMINAR JUEGO?</h2>
             <p class="text-slate-400 mb-6 font-medium text-xs">Volverás al menú principal.</p>
             <div class="flex flex-col gap-2">
-                <button onclick="confirmExit()" class="w-full bg-pink-600 hover:bg-pink-500 py-3 rounded-xl font-black text-white transition-all uppercase text-xs">SÍ, VOLVER AL MENÚ</button>
+                <button onclick="triggerInterstitialAd()" class="w-full bg-pink-600 hover:bg-pink-500 py-3 rounded-xl font-black text-white transition-all uppercase text-xs">SÍ, VOLVER AL MENÚ</button>
                 <button onclick="closeExitModal()" class="w-full bg-slate-800 hover:bg-slate-700 py-3 rounded-xl font-black text-slate-300 transition-all uppercase text-xs">CANCELAR</button>
             </div>
         </div>
+    </div>
+
+    <div id="ad-exit-modal" class="fixed inset-0 z-[100] hidden flex-col items-center justify-center bg-[#000000]">
+        <h2 class="text-sm font-black mb-6 text-pink-500 uppercase tracking-widest animate-pulse">Tomando un respiro...</h2>
+        
+        <div class="w-full max-w-[320px] bg-white/5 border border-white/10 rounded-xl p-2 mb-8 min-h-[260px] flex justify-center items-center">
+            <ins class="adsbygoogle"
+                 style="display:block; width:100%; height:250px;"
+                 data-ad-client="ca-pub-4859809577184969"
+                 data-ad-slot="3783233884"
+                 data-ad-format="rectangle"
+                 data-full-width-responsive="true"></ins>
+            <script>
+                 (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
+        </div>
+
+        <p id="ad-timer-text" class="text-slate-400 font-bold text-xs uppercase tracking-widest">Saliendo en <span id="ad-countdown" class="text-white text-lg mx-1">4</span>...</p>
+        <button id="skip-ad-btn" onclick="executeExit()" class="hidden w-64 bg-slate-800 hover:bg-slate-700 py-4 rounded-xl font-black text-white transition-all uppercase text-xs tracking-widest">
+            ✕ SALTAR ANUNCIO
+        </button>
+    </div>
+
+    <div id="bottom-banner" class="fixed bottom-0 left-0 w-full bg-[#080c14] border-t border-white/10 z-[80] flex justify-center items-center" style="min-height: 60px;">
+        <ins class="adsbygoogle"
+             style="display:inline-block;width:100%;height:60px"
+             data-ad-client="ca-pub-4859809577184969"
+             data-ad-slot="3783233884"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
     </div>
 
     <script>
@@ -222,7 +253,7 @@
                 if (!response.ok) throw new Error("Network error");
                 const data = await response.json();
                 chillCards = data.chill; partyCards = data.party; extremeCards = data.extreme; hotCards = data.hot;
-                statusLabel.innerText = "✨";
+                statusLabel.innerText = "SINCRO EN LA NUBE COMPLETADA ✨";
                 statusLabel.classList.replace('text-slate-400', 'text-green-400');
             } catch (error) {
                 chillCards = backupCards.chill; partyCards = backupCards.party; extremeCards = backupCards.extreme; hotCards = backupCards.hot;
@@ -400,7 +431,6 @@
             if (players.length < 3) return;
             playSound('click');
             
-            // Calcular Intentos
             let attempts = 1;
             if (players.length >= 5 && players.length <= 7) attempts = 2;
             if (players.length >= 8) attempts = 3;
@@ -469,8 +499,6 @@
         function renderImpostorPlay() {
             playSound('error');
             const content = document.getElementById('impostor-content');
-
-            // Generar botones de jugadores
             let playersHtml = impostorData.roles.map(r => {
                 if (impostorData.eliminated.includes(r.name)) {
                     return `<button disabled class="bg-slate-800/50 text-slate-600 border border-slate-700 py-3 rounded-xl font-bold line-through uppercase">${r.name}</button>`;
@@ -478,7 +506,6 @@
                 return `<button onclick="processAccusation('${r.name}')" class="bg-slate-800 hover:bg-slate-700 text-white border-2 border-slate-600 hover:border-pink-500 py-3 rounded-xl font-bold transition-all active:scale-95 uppercase">${r.name}</button>`;
             }).join('');
 
-            // Seleccionar a alguien al azar para que rompa el hielo (que no esté eliminado)
             let availableStarters = impostorData.roles.filter(r => !impostorData.eliminated.includes(r.name));
             let starter = availableStarters.length > 0 ? availableStarters[Math.floor(Math.random() * availableStarters.length)].name : "Alguien";
 
@@ -503,12 +530,9 @@
 
         function processAccusation(accusedName) {
             const content = document.getElementById('impostor-content');
-
             if (accusedName === impostorData.impostorName) {
-                // Ganaron los civiles
                 renderImpostorResult(true);
             } else {
-                // Equivocación
                 playSound('error');
                 impostorData.attemptsLeft--;
                 impostorData.eliminated.push(accusedName);
@@ -526,7 +550,6 @@
                         </div>
                     `;
                 } else {
-                    // Ganó el impostor
                     renderImpostorResult(false);
                 }
             }
@@ -542,7 +565,7 @@
                         <p class="text-cyan-400 font-bold uppercase tracking-widest text-sm mb-2">¡ATRAPARON AL IMPOSTOR!</p>
                         <h1 class="text-6xl font-black mb-4 text-white uppercase">${impostorData.impostorName}</h1>
                         <p class="text-slate-300 text-sm mb-8">El grupo ha ganado. <strong class="text-pink-500 text-lg uppercase">${impostorData.impostorName}</strong> toma <strong class="text-white text-xl">2 SHOTS</strong>.</p>
-                        <button onclick="confirmExit()" class="w-full bg-white text-black py-4 rounded-xl font-black text-lg active:scale-95 transition-all uppercase">
+                        <button onclick="requestExit()" class="w-full bg-white text-black py-4 rounded-xl font-black text-lg active:scale-95 transition-all uppercase">
                             Terminar Ronda 🍻
                         </button>
                     </div>
@@ -553,7 +576,7 @@
                         <p class="text-red-400 font-bold uppercase tracking-widest text-sm mb-2">¡EL IMPOSTOR LOS ENGAÑÓ!</p>
                         <h1 class="text-6xl font-black mb-4 text-white uppercase">${impostorData.impostorName}</h1>
                         <p class="text-slate-300 text-sm mb-8">El impostor sobrevive. <strong class="text-red-500 text-lg uppercase">TODOS LOS DEMÁS</strong> toman <strong class="text-white text-xl">1 SHOT</strong>.</p>
-                        <button onclick="confirmExit()" class="w-full bg-white text-black py-4 rounded-xl font-black text-lg active:scale-95 transition-all uppercase">
+                        <button onclick="requestExit()" class="w-full bg-white text-black py-4 rounded-xl font-black text-lg active:scale-95 transition-all uppercase">
                             Terminar Ronda 🍻
                         </button>
                     </div>
@@ -561,13 +584,61 @@
             }
         }
 
-        // --- SALIDA GLOBAL ---
-        function requestExit() { playSound('click'); document.getElementById('exit-modal').classList.remove('hidden'); }
-        function closeExitModal() { playSound('click'); document.getElementById('exit-modal').classList.add('hidden'); }
-        function confirmExit() {
-            playSound('click'); document.getElementById('exit-modal').classList.add('hidden');
+        // --- SISTEMA DE SALIDA CON ANUNCIO (INTERSTICIAL) ---
+        let adInterval;
+
+        function requestExit() { 
+            playSound('click'); 
+            document.getElementById('exit-modal').classList.remove('hidden'); 
+            document.getElementById('exit-modal').classList.add('flex');
+        }
+
+        function closeExitModal() { 
+            playSound('click'); 
+            document.getElementById('exit-modal').classList.add('hidden'); 
+            document.getElementById('exit-modal').classList.remove('flex');
+        }
+
+        function triggerInterstitialAd() {
+            playSound('click');
+            // Escondemos el modal de confirmación
+            document.getElementById('exit-modal').classList.add('hidden');
+            document.getElementById('exit-modal').classList.remove('flex');
+            
+            // Mostramos el modal publicitario a pantalla completa
+            const adModal = document.getElementById('ad-exit-modal');
+            adModal.classList.remove('hidden');
+            adModal.classList.add('flex');
+
+            let timeLeft = 4;
+            document.getElementById('ad-countdown').innerText = timeLeft;
+            const skipBtn = document.getElementById('skip-ad-btn');
+            const timerText = document.getElementById('ad-timer-text');
+            
+            skipBtn.classList.add('hidden');
+            timerText.classList.remove('hidden');
+
+            // Comenzamos el conteo regresivo
+            adInterval = setInterval(() => {
+                timeLeft--;
+                document.getElementById('ad-countdown').innerText = timeLeft;
+                if(timeLeft <= 0) {
+                    clearInterval(adInterval);
+                    timerText.classList.add('hidden');
+                    skipBtn.classList.remove('hidden');
+                }
+            }, 1000);
+        }
+
+        function executeExit() {
+            playSound('click');
+            // Cerramos anuncio y pantallas de juego, volvemos a inicio
+            document.getElementById('ad-exit-modal').classList.add('hidden');
+            document.getElementById('ad-exit-modal').classList.remove('flex');
+            
             document.getElementById('game-screen').classList.add('hidden');
             document.getElementById('impostor-screen').classList.add('hidden');
+            
             document.getElementById('setup-screen').classList.remove('hidden');
             activeRules = [];
         }
