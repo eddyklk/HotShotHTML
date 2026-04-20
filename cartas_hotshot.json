@@ -43,7 +43,7 @@
     { "title": "Pregunta", "desc": "Solo puedes responder con preguntas.", "shots": 0, "isRule": true },
     { "title": "Reto", "desc": "[OTRO_JUGADOR] decide un reto físico para ti. Cumple o bebe 1.", "shots": 1, "isRule": false }
   ],
-  "extreme": [
+  "caos": [
     { "title": "Fondo Total", "desc": "Toma 1 shot completo.", "shots": 1, "isRule": false },
     { "title": "El Esclavo", "desc": "[OTRO_JUGADOR] bebe contigo siempre.", "shots": 0, "isRule": true },
     { "title": "Duelo de Titanes", "desc": "Tú y [OTRO_JUGADOR] beben 2 shots.", "shots": 2, "isRule": false },
