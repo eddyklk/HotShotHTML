@@ -35,7 +35,6 @@
         .glass { background: rgba(21, 27, 43, 0.9); border: 1px solid rgba(30, 41, 59, 1); }
         .neon-border-pink { border: 2px solid var(--neon-pink); box-shadow: 0 0 20px rgba(255,0,127,0.4); }
         .neon-border-gold { border: 2px solid var(--neon-gold); box-shadow: 0 0 20px rgba(255,215,0,0.4); }
-        .neon-border-blue { border: 2px solid var(--neon-blue); box-shadow: 0 0 20px rgba(0,243,255,0.4); }
         
         .card-gradient { background: linear-gradient(135deg, #0f172a 0%, #020617 100%); }
         .btn-primary { background: linear-gradient(45deg, var(--neon-pink), var(--neon-purple)); transition: all 0.2s ease; }
@@ -147,7 +146,7 @@
             </div>
         </div>
 
-        <div id="impostor-content" class="mt-12"></div>
+        <div id="impostor-content" class="mt-12 w-full"></div>
     </div>
 
     <div id="exit-modal" class="fixed inset-0 modal-overlay z-50 hidden flex items-center justify-center p-4">
@@ -231,7 +230,6 @@
             }
         }
 
-        // STATE
         let players = [];
         let ruleCooldowns = {};
         let activeRules = [];
@@ -315,7 +313,6 @@
             else selBtn.classList.add('border-2', 'border-pink-500', 'text-white');
         }
 
-        // --- SISTEMA DE CARTAS NORMAL ---
         function startGame() {
             playSound('click'); activeRules = []; currentPlayerIndex = 0; players.forEach(p => ruleCooldowns[p] = 0);
             document.getElementById('setup-screen').classList.add('hidden');
@@ -395,12 +392,18 @@
             ['Beso', 'Mordisco'], ['Tinder', 'Instagram'], ['Boda', 'Funeral'], 
             ['Resaca', 'Borrachera'], ['Playa', 'Piscina'], ['Policía', 'Ladrón']
         ];
-        let impostorData = { roles: [], currentIndex: 0, impostorName: '' };
+        
+        let impostorData = { roles: [], currentIndex: 0, impostorName: '', attemptsLeft: 1, eliminated: [] };
 
         function startImpostor() {
             if (players.length < 3) return;
             playSound('click');
             
+            // Calcular Intentos
+            let attempts = 1;
+            if (players.length >= 5 && players.length <= 7) attempts = 2;
+            if (players.length >= 8) attempts = 3;
+
             let shuffledPlayers = [...players].sort(() => Math.random() - 0.5);
             let pair = impostorPairs[Math.floor(Math.random() * impostorPairs.length)];
             let isReversed = Math.random() > 0.5;
@@ -408,10 +411,10 @@
             let impostorWord = isReversed ? pair[0] : pair[1];
             
             impostorData.impostorName = shuffledPlayers[0];
+            impostorData.attemptsLeft = attempts;
+            impostorData.eliminated = [];
             impostorData.roles = shuffledPlayers.map((p, i) => ({
-                name: p,
-                word: i === 0 ? impostorWord : civilianWord,
-                isImpostor: i === 0
+                name: p, word: i === 0 ? impostorWord : civilianWord, isImpostor: i === 0
             })).sort(() => Math.random() - 0.5); 
             
             impostorData.currentIndex = 0;
@@ -465,35 +468,96 @@
         function renderImpostorPlay() {
             playSound('error');
             const content = document.getElementById('impostor-content');
+
+            // Generar botones de jugadores
+            let playersHtml = impostorData.roles.map(r => {
+                if (impostorData.eliminated.includes(r.name)) {
+                    return `<button disabled class="bg-slate-800/50 text-slate-600 border border-slate-700 py-3 rounded-xl font-bold line-through uppercase">${r.name}</button>`;
+                }
+                return `<button onclick="processAccusation('${r.name}')" class="bg-slate-800 hover:bg-slate-700 text-white border-2 border-slate-600 hover:border-pink-500 py-3 rounded-xl font-bold transition-all active:scale-95 uppercase">${r.name}</button>`;
+            }).join('');
+
+            // Seleccionar a alguien al azar para que rompa el hielo (que no esté eliminado)
+            let availableStarters = impostorData.roles.filter(r => !impostorData.eliminated.includes(r.name));
+            let starter = availableStarters.length > 0 ? availableStarters[Math.floor(Math.random() * availableStarters.length)].name : "Alguien";
+
             content.innerHTML = `
                 <div class="animate__animated animate__zoomIn">
-                    <div class="text-7xl mb-4">🗣️</div>
-                    <h1 class="text-4xl font-black mb-4 text-white uppercase">¡A JUGAR!</h1>
-                    <p class="text-slate-300 mb-6 px-4">Hagan una pregunta a la vez basada en su palabra para descubrir quién es el impostor (el que tiene una palabra distinta).</p>
-                    <div class="bg-pink-500/20 border border-pink-500 p-4 rounded-2xl mb-8">
-                        <p class="text-pink-400 font-bold uppercase text-sm">Empieza preguntando:</p>
-                        <p class="text-2xl font-black text-white mt-1">${impostorData.roles[Math.floor(Math.random() * impostorData.roles.length)].name}</p>
+                    <div class="text-6xl mb-2">🗣️</div>
+                    <h1 class="text-3xl font-black mb-2 text-white uppercase">¡A DEBATIR!</h1>
+                    <p class="text-cyan-400 font-bold mb-4 uppercase text-sm tracking-widest">INTENTOS RESTANTES: <span class="text-3xl ml-1 text-white">${impostorData.attemptsLeft}</span></p>
+
+                    <div class="bg-pink-500/10 border border-pink-500/30 p-4 rounded-2xl mb-6">
+                        <p class="text-pink-400 font-bold uppercase text-xs">Para romper el hielo, empieza preguntando:</p>
+                        <p class="text-xl font-black text-white mt-1">${starter}</p>
                     </div>
-                    <button onclick="renderImpostorResult()" class="w-full bg-red-600 hover:bg-red-500 py-4 rounded-[20px] font-black text-xl shadow-[0_0_20px_rgba(255,0,0,0.4)] active:scale-95 transition-all uppercase">
-                        Revelar Impostor 🚨
-                    </button>
+
+                    <p class="text-slate-400 text-xs mb-3 uppercase font-bold tracking-widest">Elijan al sospechoso:</p>
+                    <div class="grid grid-cols-2 gap-2 mb-4">
+                        ${playersHtml}
+                    </div>
                 </div>
             `;
         }
 
-        function renderImpostorResult() {
-            playSound('error');
+        function processAccusation(accusedName) {
             const content = document.getElementById('impostor-content');
-            content.innerHTML = `
-                <div class="glass p-8 rounded-[35px] border-2 border-red-500 shadow-[0_0_40px_rgba(255,0,0,0.4)] animate__animated animate__tada">
-                    <p class="text-red-400 font-bold uppercase tracking-widest text-sm mb-2">EL IMPOSTOR ERA...</p>
-                    <h1 class="text-6xl font-black mb-4 text-white uppercase">${impostorData.impostorName}</h1>
-                    <p class="text-slate-300 text-sm mb-8">Si descubrieron al impostor, el impostor toma <strong class="text-red-500 text-lg">3 SHOTS</strong>. Si el impostor engañó a todos, los demás toman 1 shot.</p>
-                    <button onclick="confirmExit()" class="w-full bg-white text-black py-4 rounded-xl font-black text-lg active:scale-95 transition-all uppercase">
-                        Terminar Ronda 🍻
-                    </button>
-                </div>
-            `;
+
+            if (accusedName === impostorData.impostorName) {
+                // Ganaron los civiles
+                renderImpostorResult(true);
+            } else {
+                // Equivocación
+                playSound('error');
+                impostorData.attemptsLeft--;
+                impostorData.eliminated.push(accusedName);
+
+                if (impostorData.attemptsLeft > 0) {
+                    content.innerHTML = `
+                        <div class="glass p-8 rounded-[35px] border border-red-500 shadow-[0_0_30px_rgba(255,0,0,0.2)] animate__animated animate__shakeX">
+                            <div class="text-6xl mb-4">❌</div>
+                            <h1 class="text-3xl font-black mb-2 text-white uppercase">${accusedName}</h1>
+                            <p class="text-red-400 font-bold uppercase tracking-widest text-sm mb-6">NO ES EL IMPOSTOR</p>
+                            <p class="text-slate-300 text-sm mb-8">Les quedan <strong class="text-white text-lg">${impostorData.attemptsLeft}</strong> intentos.</p>
+                            <button onclick="renderImpostorPlay()" class="w-full bg-slate-800 hover:bg-slate-700 text-white border border-slate-600 py-4 rounded-xl font-black text-lg active:scale-95 transition-all uppercase">
+                                Seguir debatiendo 🗣️
+                            </button>
+                        </div>
+                    `;
+                } else {
+                    // Ganó el impostor
+                    renderImpostorResult(false);
+                }
+            }
+        }
+
+        function renderImpostorResult(civiliansWon) {
+            playSound(civiliansWon ? 'card' : 'error');
+            const content = document.getElementById('impostor-content');
+
+            if (civiliansWon) {
+                content.innerHTML = `
+                    <div class="glass p-8 rounded-[35px] border-2 border-cyan-500 shadow-[0_0_40px_rgba(0,243,255,0.4)] animate__animated animate__tada">
+                        <p class="text-cyan-400 font-bold uppercase tracking-widest text-sm mb-2">¡ATRAPARON AL IMPOSTOR!</p>
+                        <h1 class="text-6xl font-black mb-4 text-white uppercase">${impostorData.impostorName}</h1>
+                        <p class="text-slate-300 text-sm mb-8">El grupo ha ganado. <strong class="text-pink-500 text-lg uppercase">${impostorData.impostorName}</strong> toma <strong class="text-white text-xl">3 SHOTS</strong>.</p>
+                        <button onclick="confirmExit()" class="w-full bg-white text-black py-4 rounded-xl font-black text-lg active:scale-95 transition-all uppercase">
+                            Terminar Ronda 🍻
+                        </button>
+                    </div>
+                `;
+            } else {
+                content.innerHTML = `
+                    <div class="glass p-8 rounded-[35px] border-2 border-red-500 shadow-[0_0_40px_rgba(255,0,0,0.4)] animate__animated animate__tada">
+                        <p class="text-red-400 font-bold uppercase tracking-widest text-sm mb-2">¡EL IMPOSTOR LOS ENGAÑÓ!</p>
+                        <h1 class="text-6xl font-black mb-4 text-white uppercase">${impostorData.impostorName}</h1>
+                        <p class="text-slate-300 text-sm mb-8">El impostor sobrevive. <strong class="text-red-500 text-lg uppercase">TODOS LOS DEMÁS</strong> toman <strong class="text-white text-xl">1 SHOT</strong>.</p>
+                        <button onclick="confirmExit()" class="w-full bg-white text-black py-4 rounded-xl font-black text-lg active:scale-95 transition-all uppercase">
+                            Terminar Ronda 🍻
+                        </button>
+                    </div>
+                `;
+            }
         }
 
         // --- SALIDA GLOBAL ---
