@@ -87,7 +87,7 @@
     { "title": "Roce", "desc": "Siéntate en las piernas de [OTRO_JUGADOR] durante toda 1 ronda.", "shots": 0, "isRule": true },
     { "title": "Al Desnudo", "desc": "Quítate dos prendas o tomate 3 shots. Tú eliges.", "shots": 3, "isRule": false }
   ],
- "impostor": [
+  "impostor": [
     ["Cerveza", "Ron"], 
     ["Ex", "Casi algo"], 
     ["Beso", "Pico"], 
@@ -177,5 +177,17 @@
     ["Techo", "Piso"],
     ["Llave", "Candado"],
     ["Vela", "Linterna"]
-]
+  ],
+  "roulette": [
+    "Tómate 3 shots seguidos sin respirar. 🥃🥃🥃",
+    "Mezcla un poco de las bebidas de los que están a tu lado y bébetelo. 🤢",
+    "Fondo blanco a tu vaso actual. ¡Hasta la última gota! 🍻",
+    "Bebe 1 shot por cada jugador en la mesa. 💀",
+    "Quítate una prenda de ropa o tómate 4 shots. 🌶️",
+    "No puedes hablar por 3 rondas. Si lo haces, bebes 2 shots. 🤐",
+    "Elige a otro jugador para que beba 2 shots contigo. 👯",
+    "Dale tu celular al de tu derecha para que envíe un mensaje a quien quiera. Si te niegas, 3 shots. 📱",
+    "Haz 10 flexiones de pecho. Si no puedes, 2 shots. 💪",
+    "Toma un shot sin usar las manos. 🖐️🚫"
+  ]
 }
