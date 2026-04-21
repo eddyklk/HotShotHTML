@@ -296,13 +296,26 @@
         
         let chillCards = [], partyCards = [], caosCards = [], hotCards = [];
         let impostorPairs = [];
+        let roulettePunishments = [];
         
         const backupCards = {
             chill: [{ title: "Yo Nunca", desc: "Bebe 1 si alguna vez has mentido para salir de una cita.", shots: 1, isRule: false }],
             party: [{ title: "Votación Letal", desc: "Señalen al más problemático. Bebe 1.", shots: 1, isRule: false }],
             caos: [{ title: "Fondo Total", desc: "Toma 1 shot completo.", shots: 1, isRule: false }],
             hot: [{ title: "Prenda o Shot", desc: "Quítate una prenda de ropa o toma 2 shots.", shots: 2, isRule: false }],
-            impostor: [['Cerveza', 'Ron'], ['Ex', 'Casi algo'], ['Discoteca', 'Bar']]
+            impostor: [['Cerveza', 'Ron'], ['Ex', 'Casi algo'], ['Discoteca', 'Bar']],
+            roulette: [
+                "Tómate 3 shots seguidos sin respirar. 🥃🥃🥃",
+                "Mezcla un poco de las bebidas de los que están a tu lado y bébetelo. 🤢",
+                "Fondo blanco a tu vaso actual. ¡Hasta la última gota! 🍻",
+                "Bebe 1 shot por cada jugador en la mesa. 💀",
+                "Quítate una prenda de ropa o tómate 4 shots. 🌶️",
+                "No puedes hablar por 3 rondas. Si lo haces, bebes 2 shots. 🤐",
+                "Elige a otro jugador para que beba 2 shots contigo. 👯",
+                "Dale tu celular al de tu derecha para que envíe un mensaje a quien quiera. Si te niegas, 3 shots. 📱",
+                "Haz 10 flexiones de pecho. Si no puedes, 2 shots. 💪",
+                "Toma un shot sin usar las manos. 🖐️🚫"
+            ]
         };
 
         async function fetchCards() {
@@ -317,6 +330,7 @@
                 caosCards = data.caos; 
                 hotCards = data.hot;
                 impostorPairs = data.impostor || backupCards.impostor;
+                roulettePunishments = data.roulette || backupCards.roulette;
                 
                 statusLabel.innerText = "✨"; 
                 statusLabel.title = "Sincronizado con la nube";
@@ -326,6 +340,7 @@
                 caosCards = backupCards.caos; 
                 hotCards = backupCards.hot;
                 impostorPairs = backupCards.impostor;
+                roulettePunishments = backupCards.roulette;
                 
                 statusLabel.innerText = "⚠️"; 
                 statusLabel.title = "Modo Offline";
@@ -668,19 +683,6 @@
         }
 
         // --- SISTEMA MODO RULETA RUSA 🎯 ---
-        const roulettePunishments = [
-            "Tómate 3 shots seguidos sin respirar. 🥃🥃🥃",
-            "Mezcla un poco de las bebidas de los que están a tu lado y bébetelo. 🤢",
-            "Fondo blanco a tu vaso actual. ¡Hasta la última gota! 🍻",
-            "Bebe 1 shot por cada jugador en la mesa. 💀",
-            "Quítate una prenda de ropa o tómate 4 shots. 🌶️",
-            "No puedes hablar por 3 rondas. Si lo haces, bebes 2 shots. 🤐",
-            "Elige a otro jugador para que beba 2 shots contigo. 👯",
-            "Dale tu celular al de tu derecha para que envíe un mensaje a quien quiera. Si te niegas, 3 shots. 📱",
-            "Haz 10 flexiones de pecho. Si no puedes, 2 shots. 💪",
-            "Toma un shot sin usar las manos. 🖐️🚫"
-        ];
-        
         let spinInterval;
 
         function startRoulette() {
@@ -690,7 +692,6 @@
             document.getElementById('mode-setup-screen').classList.add('hidden');
             document.getElementById('roulette-screen').classList.remove('hidden');
             
-            // Reiniciar estado visual
             const nameEl = document.getElementById('roulette-name');
             const punBox = document.getElementById('roulette-punishment-box');
             const btn = document.getElementById('spin-btn');
@@ -719,7 +720,7 @@
             nameEl.classList.add('text-white');
 
             let spins = 0;
-            const maxSpins = 30; // Pasará 30 nombres rapidísimo (3 segundos aprox)
+            const maxSpins = 30; 
             
             spinInterval = setInterval(() => {
                 nameEl.innerText = players[Math.floor(Math.random() * players.length)].toUpperCase();
@@ -733,7 +734,7 @@
         }
 
         function finishSpin() {
-            playSound('error'); // Sonido dramático al parar
+            playSound('error'); 
             const nameEl = document.getElementById('roulette-name');
             const punBox = document.getElementById('roulette-punishment-box');
             const punEl = document.getElementById('roulette-punishment');
@@ -807,7 +808,6 @@
             document.getElementById('impostor-screen').classList.add('hidden');
             document.getElementById('roulette-screen').classList.add('hidden');
             
-            // Volver a la pantalla de selección de modos
             document.getElementById('mode-setup-screen').classList.remove('hidden');
             activeRules = [];
         }
