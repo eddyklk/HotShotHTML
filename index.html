@@ -37,6 +37,7 @@
         .glass { background: rgba(21, 27, 43, 0.9); border: 1px solid rgba(30, 41, 59, 1); }
         .neon-border-pink { border: 2px solid var(--neon-pink); box-shadow: 0 0 20px rgba(255,0,127,0.4); }
         .neon-border-gold { border: 2px solid var(--neon-gold); box-shadow: 0 0 20px rgba(255,215,0,0.4); }
+        .neon-border-red { border: 2px solid var(--neon-red); box-shadow: 0 0 20px rgba(255,49,49,0.4); }
         
         .card-gradient { background: linear-gradient(135deg, #0f172a 0%, #020617 100%); }
         .btn-primary { background: linear-gradient(45deg, var(--neon-pink), var(--neon-purple)); transition: all 0.2s ease; }
@@ -93,15 +94,15 @@
         </button>
     </div>
 
-    <div id="mode-setup-screen" class="hidden w-full max-w-md animate__animated animate__fadeIn relative z-10 pt-2 text-center">
+    <div id="mode-setup-screen" class="hidden w-full max-w-md animate__animated animate__fadeIn relative z-10 pt-2 text-center pb-8">
         <div class="flex justify-between items-center mb-4">
             <button onclick="goToPlayerSetup()" class="text-slate-500 hover:text-white transition-colors font-bold text-[10px] tracking-widest bg-slate-800/50 px-3 py-2 rounded-lg">🔙 JUGADORES</button>
         </div>
         
         <h1 class="text-3xl font-black mb-6 text-white uppercase tracking-tight">¿QUÉ JUGAMOS?</h1>
 
-        <div class="glass rounded-[20px] p-6 mb-4 shadow-xl border border-pink-500/30">
-            <h2 class="text-xl font-black mb-2 text-pink-400 flex items-center justify-center tracking-widest title-font tracking-widest">🃏 CARTAS HOT SHOT</h2>
+        <div class="glass rounded-[20px] p-6 mb-4 shadow-xl border border-pink-500/30 relative overflow-hidden">
+            <h2 class="text-xl font-black mb-2 text-pink-400 flex items-center justify-center tracking-widest title-font">🃏 CARTAS HOT SHOT</h2>
             <p class="text-slate-400 text-xs mb-4">Retos, castigos y dinámicas de grupo.</p>
             
             <div class="grid grid-cols-2 gap-2 mb-4">
@@ -111,17 +112,26 @@
                 <button onclick="setDifficulty('hot')" class="diff-btn p-2 rounded-xl bg-slate-800 text-slate-400 border border-transparent text-[10px] font-bold uppercase transition-all">Caliente 🌶️</button>
             </div>
             
-            <button onclick="startGame()" class="w-full btn-primary py-3 rounded-[12px] font-black text-sm uppercase tracking-wider">
+            <button onclick="startGame()" class="w-full btn-primary py-3 rounded-[12px] font-black text-sm uppercase tracking-wider shadow-lg">
                 INICIAR CARTAS
             </button>
         </div>
 
-        <div class="glass rounded-[20px] p-6 shadow-xl border border-cyan-500/30">
-            <h2 class="text-xl font-black mb-2 text-cyan-400 flex items-center justify-center tracking-widest title-font tracking-widest">🕵️ EL IMPOSTOR</h2>
-            <p class="text-slate-400 text-xs mb-4">Descubre quién tiene la palabra diferente debatiendo en grupo.</p>
+        <div class="glass rounded-[20px] p-6 mb-4 shadow-xl border border-cyan-500/30">
+            <h2 class="text-xl font-black mb-2 text-cyan-400 flex items-center justify-center tracking-widest title-font">🕵️ EL IMPOSTOR</h2>
+            <p class="text-slate-400 text-xs mb-4">Descubre quién tiene la palabra diferente debatiendo.</p>
             
             <button onclick="startImpostor()" id="impostor-btn" class="w-full bg-slate-800 border border-slate-700 text-slate-400 hover:text-white py-3 rounded-[12px] font-black text-sm transition-all opacity-50 cursor-not-allowed uppercase tracking-wider" disabled>
                 (Mín. 3 JUGADORES)
+            </button>
+        </div>
+
+        <div class="glass rounded-[20px] p-6 shadow-xl border border-red-500/30">
+            <h2 class="text-xl font-black mb-2 text-red-500 flex items-center justify-center tracking-widest title-font">🎯 RULETA RUSA</h2>
+            <p class="text-slate-400 text-xs mb-4">La muerte súbita. Un jugador al azar, un castigo extremo.</p>
+            
+            <button onclick="startRoulette()" id="roulette-btn" class="w-full bg-slate-800 border border-slate-700 text-slate-400 hover:text-white py-3 rounded-[12px] font-black text-sm transition-all opacity-50 cursor-not-allowed uppercase tracking-wider shadow-[0_0_15px_rgba(255,0,0,0.2)]" disabled>
+                (Mín. 2 JUGADORES)
             </button>
         </div>
     </div>
@@ -167,6 +177,32 @@
             </div>
         </div>
         <div id="impostor-content" class="mt-12 w-full"></div>
+    </div>
+
+    <div id="roulette-screen" class="hidden w-full max-w-md animate__animated animate__fadeIn relative z-10 text-center flex flex-col justify-center min-h-[75vh]">
+        <div class="flex justify-between items-center absolute top-2 left-0 right-0 w-full">
+            <button onclick="requestExit()" class="text-slate-500 hover:text-white transition-colors font-bold text-[10px] tracking-widest">✕ SALIR</button>
+            <div class="bg-red-500/10 px-3 py-1.5 rounded-full border border-red-500/50 text-red-500 text-[10px] font-black uppercase tracking-widest">
+                RULETA RUSA 🎯
+            </div>
+        </div>
+
+        <div class="glass p-8 rounded-[35px] neon-border-red mt-8 relative overflow-hidden bg-[#0a0505]">
+            <p class="text-red-400 font-bold uppercase tracking-widest text-xs mb-6">LA VÍCTIMA ES...</p>
+            
+            <div class="h-28 flex items-center justify-center mb-6 border-y border-red-500/30 bg-black/80 shadow-inner overflow-hidden">
+                <h1 id="roulette-name" class="text-5xl font-black text-slate-600 uppercase tracking-wider transition-colors duration-100">❓❓❓</h1>
+            </div>
+
+            <div id="roulette-punishment-box" class="hidden animate__animated animate__zoomIn">
+                <p class="text-slate-400 text-[10px] uppercase tracking-widest mb-2 font-bold">Castigo Extreme:</p>
+                <p id="roulette-punishment" class="text-lg font-bold text-white mb-6 leading-relaxed">...</p>
+            </div>
+
+            <button id="spin-btn" onclick="executeSpin()" class="w-full bg-red-600 hover:bg-red-500 py-4 rounded-xl font-black text-white text-lg active:scale-95 transition-all uppercase shadow-[0_0_20px_rgba(255,0,0,0.4)] tracking-widest">
+                GIRAR RULETA 🎰
+            </button>
+        </div>
     </div>
 
     <div id="exit-modal" class="fixed inset-0 modal-overlay z-[90] hidden flex items-center justify-center p-4">
@@ -266,10 +302,7 @@
             party: [{ title: "Votación Letal", desc: "Señalen al más problemático. Bebe 1.", shots: 1, isRule: false }],
             caos: [{ title: "Fondo Total", desc: "Toma 1 shot completo.", shots: 1, isRule: false }],
             hot: [{ title: "Prenda o Shot", desc: "Quítate una prenda de ropa o toma 2 shots.", shots: 2, isRule: false }],
-            impostor: [
-                ['Cerveza', 'Ron'], ['Ex', 'Casi algo'], ['Discoteca', 'Bar'], ['Hotel', 'Motel'], 
-                ['Beso', 'Mordisco'], ['Tinder', 'Instagram'], ['Boda', 'Funeral']
-            ]
+            impostor: [['Cerveza', 'Ron'], ['Ex', 'Casi algo'], ['Discoteca', 'Bar']]
         };
 
         async function fetchCards() {
@@ -359,13 +392,22 @@
 
             const nextBtn = document.getElementById('next-btn');
             const impBtn = document.getElementById('impostor-btn');
+            const roulBtn = document.getElementById('roulette-btn');
             
             if (players.length >= 2) {
                 nextBtn.disabled = false; nextBtn.classList.remove('opacity-50', 'cursor-not-allowed');
                 nextBtn.innerText = "SIGUIENTE 👉";
+                
+                roulBtn.disabled = false; roulBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                roulBtn.classList.replace('text-slate-400', 'text-red-400');
+                roulBtn.innerText = "INICIAR RULETA 🎰";
             } else {
                 nextBtn.disabled = true; nextBtn.classList.add('opacity-50', 'cursor-not-allowed');
                 nextBtn.innerText = "AGREGA MÁS JUGADORES...";
+                
+                roulBtn.disabled = true; roulBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                roulBtn.classList.replace('text-red-400', 'text-slate-400');
+                roulBtn.innerText = "(MÍNIMO 2 JUGADORES)";
             }
 
             if (players.length >= 3) {
@@ -391,6 +433,7 @@
             else selBtn.classList.add('border-2', 'border-pink-500', 'text-white');
         }
 
+        // --- SISTEMA MODO CARTAS ---
         function startGame() {
             playSound('click'); activeRules = []; currentPlayerIndex = 0; players.forEach(p => ruleCooldowns[p] = 0);
             document.getElementById('mode-setup-screen').classList.add('hidden');
@@ -624,6 +667,94 @@
             }
         }
 
+        // --- SISTEMA MODO RULETA RUSA 🎯 ---
+        const roulettePunishments = [
+            "Tómate 3 shots seguidos sin respirar. 🥃🥃🥃",
+            "Mezcla un poco de las bebidas de los que están a tu lado y bébetelo. 🤢",
+            "Fondo blanco a tu vaso actual. ¡Hasta la última gota! 🍻",
+            "Bebe 1 shot por cada jugador en la mesa. 💀",
+            "Quítate una prenda de ropa o tómate 4 shots. 🌶️",
+            "No puedes hablar por 3 rondas. Si lo haces, bebes 2 shots. 🤐",
+            "Elige a otro jugador para que beba 2 shots contigo. 👯",
+            "Dale tu celular al de tu derecha para que envíe un mensaje a quien quiera. Si te niegas, 3 shots. 📱",
+            "Haz 10 flexiones de pecho. Si no puedes, 2 shots. 💪",
+            "Toma un shot sin usar las manos. 🖐️🚫"
+        ];
+        
+        let spinInterval;
+
+        function startRoulette() {
+            if (players.length < 2) return;
+            playSound('click');
+            
+            document.getElementById('mode-setup-screen').classList.add('hidden');
+            document.getElementById('roulette-screen').classList.remove('hidden');
+            
+            // Reiniciar estado visual
+            const nameEl = document.getElementById('roulette-name');
+            const punBox = document.getElementById('roulette-punishment-box');
+            const btn = document.getElementById('spin-btn');
+            
+            nameEl.innerText = "❓❓❓";
+            nameEl.classList.remove('text-pink-500', 'animate__tada', 'animate__animated');
+            nameEl.classList.add('text-slate-600');
+            punBox.classList.add('hidden');
+            
+            btn.disabled = false;
+            btn.classList.remove('opacity-50', 'cursor-not-allowed');
+            btn.innerText = "GIRAR RULETA 🎰";
+        }
+
+        function executeSpin() {
+            playSound('click');
+            const btn = document.getElementById('spin-btn');
+            const nameEl = document.getElementById('roulette-name');
+            const punBox = document.getElementById('roulette-punishment-box');
+            
+            btn.disabled = true;
+            btn.classList.add('opacity-50', 'cursor-not-allowed');
+            punBox.classList.add('hidden');
+            
+            nameEl.classList.remove('text-pink-500', 'animate__tada', 'animate__animated', 'text-slate-600');
+            nameEl.classList.add('text-white');
+
+            let spins = 0;
+            const maxSpins = 30; // Pasará 30 nombres rapidísimo (3 segundos aprox)
+            
+            spinInterval = setInterval(() => {
+                nameEl.innerText = players[Math.floor(Math.random() * players.length)].toUpperCase();
+                spins++;
+                
+                if(spins >= maxSpins) {
+                    clearInterval(spinInterval);
+                    finishSpin();
+                }
+            }, 100);
+        }
+
+        function finishSpin() {
+            playSound('error'); // Sonido dramático al parar
+            const nameEl = document.getElementById('roulette-name');
+            const punBox = document.getElementById('roulette-punishment-box');
+            const punEl = document.getElementById('roulette-punishment');
+            const btn = document.getElementById('spin-btn');
+
+            const victim = players[Math.floor(Math.random() * players.length)];
+            const punishment = roulettePunishments[Math.floor(Math.random() * roulettePunishments.length)];
+
+            nameEl.innerText = victim.toUpperCase();
+            nameEl.classList.remove('text-white');
+            nameEl.classList.add('text-pink-500', 'animate__animated', 'animate__tada');
+
+            punEl.innerText = punishment;
+            punBox.classList.remove('hidden');
+
+            btn.disabled = false;
+            btn.classList.remove('opacity-50', 'cursor-not-allowed');
+            btn.innerText = "GIRAR DE NUEVO 🎰";
+        }
+
+
         // --- SISTEMA DE SALIDA CON ANUNCIO (INTERSTICIAL) ---
         let adInterval;
 
@@ -674,6 +805,7 @@
             
             document.getElementById('game-screen').classList.add('hidden');
             document.getElementById('impostor-screen').classList.add('hidden');
+            document.getElementById('roulette-screen').classList.add('hidden');
             
             // Volver a la pantalla de selección de modos
             document.getElementById('mode-setup-screen').classList.remove('hidden');
